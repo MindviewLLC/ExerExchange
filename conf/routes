@@ -2,10 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /api/                       controllers.TopicController.getTopLevel()
-GET     /api/*parentId              controllers.TopicController.get(parentId: Option[String])
-POST    /api/                       controllers.TopicController.createTopLevel()
-POST    /api/*parentId              controllers.TopicController.create(parentId: Option[String])
+GET     /api/                       controllers.NodeController.getTopLevel()
+GET     /api/*parentId              controllers.NodeController.get(parentId: Option[String])
+POST    /api/                       controllers.NodeController.createTopLevel()
+POST    /api/*parentId              controllers.NodeController.create(parentId: Option[String])
 
 
 # Map static resources from the /public folder to the /assets URL path
