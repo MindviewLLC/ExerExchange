@@ -14,9 +14,9 @@ import play.api.libs.json.JsObject
 import utils.UrlUtils
 
 case class Topic(
-  id: String,
   name: String,
-  @Key("parent-id") parentId: String,
+  urlFriendlyName: String,
+  @Key("path") path: Option[String],
   approved: Boolean = false,
   moderators: Option[Vector[User]] = None
 )
@@ -28,20 +28,19 @@ object Topic extends ModelCompanion[Topic, ObjectId] {
   implicit object TopicFormat extends Format[Topic] {
     def reads(json: JsValue): Topic = {
       val name = (json \ "name").as[String]
-      val parentId = (json \ "parent-id").as[String]
       Topic(
-        id = parentId + "/" + UrlUtils.getUrlFriendlyName(name),
         name = name,
-        parentId = parentId
+        urlFriendlyName = UrlUtils.getUrlFriendlyName(name),
+        path = (json \ "path").asOpt[String]
       )
     }
     def writes(topic: Topic): JsValue =  JsObject(Seq(
-      "id" -> JsString(topic.id.toString),
       "name" -> JsString(topic.name),
-      "parent-id" -> JsString(topic.parentId)
+      "url-friendly-name" -> JsString(topic.urlFriendlyName),
+      "path" -> topic.path.map(JsString(_)).getOrElse(JsNull)
     ))
   }
   
-  def findAllByParentId(parentId: String) = dao.find(MongoDBObject("topics.parent-id" -> parentId))
+  def findAllByPath(path: Option[String]) = dao.find(MongoDBObject("path" -> path))
   
 }

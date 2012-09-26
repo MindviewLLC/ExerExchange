@@ -6,11 +6,12 @@ $ ->
       type: event.currentTarget.method
       dataType: 'json'
       contentType: 'application/json'
-      data: JSON.stringify({name: $("#topicNameInput").val(), "parent-id": getCurrentTopicPath()})
+      data: JSON.stringify({name: $("#topicNameInput").val()})
       error: (jqXHR, textStatus, errorThrown) ->
         console.log textStatus
       success: (data, textStatus, jqXHR) ->
         getTopics()
+        # todo: navigate to the new topic 
         $("#topicNameInput").val("")
   
   getCurrentTopic()
@@ -23,8 +24,10 @@ getTopics = () ->
     topicList = $("#topicList")
     topicList.empty()
     $.each data, (index, topic) ->
-      
-      topicList.append $("<li>").text topic.name
+      topicPath = "/" + topic["url-friendly-name"]
+      if (topic.path != null)
+        topicPath = "/" + topic.path + topicPath
+      topicList.append $("<li>").append $("<a>").attr("href", topicPath).text(topic.name)
 
 # get current topic from url
 getCurrentTopic = () ->
