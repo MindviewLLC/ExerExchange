@@ -11,35 +11,37 @@ import models.mongoContext._
 import play.api.libs.json._
 import scala.Predef._
 import play.api.libs.json.JsObject
+import utils.UrlUtils
 
 case class Topic(
-  id: ObjectId = new ObjectId,
+  id: String,
   name: String,
-  urlFriendlyName: String,
+  @Key("parent-id") parentId: String,
   approved: Boolean = false,
-  @Key("parent_topic_id") parentTopic: Option[ObjectId] = None,
   moderators: Option[Vector[User]] = None
 )
 
 object Topic extends ModelCompanion[Topic, ObjectId] {
-  
+
   val dao = new SalatDAO[Topic, ObjectId](collection = mongoCollection("topics")) {}
 
   implicit object TopicFormat extends Format[Topic] {
-    def reads(json: JsValue): Topic = Topic(
-        name = (json \ "name").as[String],
-        urlFriendlyName = (json \ "name").as[String],
-        parentTopic = (json \ "parent-id").asOpt[String].map(new ObjectId(_))
-    )
+    def reads(json: JsValue): Topic = {
+      val name = (json \ "name").as[String]
+      val parentId = (json \ "parent-id").as[String]
+      Topic(
+        id = parentId + "/" + UrlUtils.getUrlFriendlyName(name),
+        name = name,
+        parentId = parentId
+      )
+    }
     def writes(topic: Topic): JsValue =  JsObject(Seq(
       "id" -> JsString(topic.id.toString),
       "name" -> JsString(topic.name),
-      "parent-id" -> topic.parentTopic.map { parentObjectId =>
-        JsString(parentObjectId.toString)
-      }.getOrElse(JsNull)
+      "parent-id" -> JsString(topic.parentId)
     ))
   }
   
-  //def children(topic: Topic) = dao.find(MongoDBObject("topics.parent_topic_id" -> topic.id))
+  def findAllByParentId(parentId: String) = dao.find(MongoDBObject("topics.parent-id" -> parentId))
   
 }

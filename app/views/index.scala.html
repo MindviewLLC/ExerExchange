@@ -1,7 +1,15 @@
-@(message: String)
+@()
 
-@main("Welcome to Play 2.0") {
+@main("ExerExchange") {
     
-    @message
+    <script type='text/javascript' src='@routes.Assets.at("javascripts/index.js")'></script>
+
+    <ul id="topicList"></ul>
+
+    <h2>Create a Topic:</h2>
+    <form id="newTopicForm" method="post">
+        <input id="topicNameInput">
+        <input type="submit" value="Save Topic">
+    </form>
     
 }

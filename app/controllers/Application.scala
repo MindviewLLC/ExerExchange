@@ -5,8 +5,8 @@ import play.api.mvc._
 
 object Application extends Controller {
   
-  def index = Action {
-    Ok(views.html.index("hello, world"))
+  def index(topic: String) = Action {
+    Ok(views.html.index())
   }
   
 }
